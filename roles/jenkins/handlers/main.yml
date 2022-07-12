@@ -1,0 +1,4 @@
+- name: Reload Jenkins
+  service:
+    name: jenkins
+    state: reloaded

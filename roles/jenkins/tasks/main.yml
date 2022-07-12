@@ -1,0 +1,31 @@
+---
+
+- name: Install packages
+  ansible.builtin.package:
+    name: "{{ webserver_packages }}"
+    state: latest
+
+- name: Download Long Term Jenkins release
+  get_url:
+    url: "{{ jenkins_repo_url }}"
+    dest: "{{ jenkins_repo_dest }}"
+
+- name: Import jenkins key from url
+  ansible.builtin.rpm_key:
+    state: present
+    key: "{{ jenkins_rpm_key }}"
+
+- name: Install Java and Jenkins
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items: "{{ apps }}"
+
+- name: daemon-reload to pick up config changes
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Start jenkins
+  ansible.builtin.systemd:
+    name: jenkins
+    state: started
